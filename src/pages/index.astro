@@ -1,7 +1,5 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
 
@@ -10,31 +8,68 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
   </head>
-  <body>
-    <Header />
-			<main class="container">
-				<section class="hero">
-					<h1>👋 Holla, Visitor!</h1>
-					<p>
-						Welcome to the <strong>NeaByteLab</strong> website, a simple site built with Astro JS.
-					</p>
-					<p>
-						NeaByteLab is my personal initiative, where I focus on creating high-performance tools, experimenting with innovative technologies, and delivering solutions that solve real-world problems. The work spans software engineering, automation, trading systems, and cybersecurity — all with a strong emphasis on clean, efficient, and scalable development.
-					</p>
-					<p>
-						The core mission of NeaByteLab is to share knowledge and technology through open-source projects. From developer utilities and API services to static site generators and security tools, every project reflects a commitment to quality, accessibility, and continuous learning.
-					</p>
-					<p>
-						My vision is to build technology that not only pushes boundaries but also inspires others to learn, contribute, and innovate. I believe that collaboration and transparency are key to meaningful progress in the tech community.
-					</p>
-					<p>
-						While this site itself contains no content or projects at the moment, you can explore everything I’m building and contributing to on GitHub.  
-					</p>
-					<p>
-						👉 <a href="https://github.com/NeaByteLab" target="_blank" rel="noopener">Visit my GitHub to explore my work</a>.
-					</p>
-				</section>
-			</main>
-    <Footer />
+  <body class="bg-[#000000] text-[#e5e5e5]">
+    <main class="min-h-screen">
+      <!-- Hero Section -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-12">
+        <div class="text-center">
+          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-light mb-6 tracking-tight">
+            <span class="text-[#16a34a] animate-pulse">Hello, I'm NeaByte</span>
+          </h1>
+          <p class="text-xl sm:text-2xl text-[#8a8a8a] max-w-2xl mx-auto leading-relaxed">
+            I build stuff when I need it. Sometimes it's good. Sometimes it's just okay. But it works.
+          </p>
+        </div>
+      </section>
+      <!-- Content Grid -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div class="grid md:grid-cols-2 gap-8 mb-16">
+          <!-- Focus Areas -->
+          <div class="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-8 hover:border-[#16a34a] transition-colors">
+            <h2 class="text-xl font-medium mb-4 text-[#e5e5e5] flex items-center gap-2">
+              <span class="text-[#16a34a]">○</span>
+              What I Build
+            </h2>
+            <p class="text-[#8a8a8a] leading-relaxed">
+              CLI tools, APIs, scrapers, and utilities I built because I needed them. Nothing fancy, just practical stuff that solves real problems. I've spent way too much time debugging complex code at 2am, so I keep things simple.
+            </p>
+          </div>
+          <!-- Mission -->
+          <div class="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-8 hover:border-[#16a34a] transition-colors">
+            <h2 class="text-xl font-medium mb-4 text-[#e5e5e5] flex items-center gap-2">
+              <span class="text-[#16a34a]">○</span>
+              Work in Public
+            </h2>
+            <p class="text-[#8a8a8a] leading-relaxed">
+              Everything lives on GitHub where you can see it, use it, or judge my coding choices. I've made plenty of mistakes (over-abstracting, premature optimization, the usual), but at least they're public so others can avoid them.
+            </p>
+          </div>
+        </div>
+        <!-- Vision Section -->
+        <div class="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-8 hover:border-[#16a34a] transition-colors">
+          <h2 class="text-xl font-medium mb-4 text-[#e5e5e5] flex items-center gap-2">
+            <span class="text-[#16a34a]">○</span>
+            Philosophy
+          </h2>
+          <p class="text-[#8a8a8a] leading-relaxed mb-4">
+            I learned the hard way that simple beats clever every time. I've spent days on abstractions that were cancelled, struggled with complex code at 2am, and over-engineered things that should have been simple. Now I just build what works.
+          </p>
+          <blockquote class="border-l-4 border-[#16a34a] pl-6 italic text-[#8a8a8a]">
+            Don't be afraid to write boring code. Boring is underrated.
+          </blockquote>
+        </div>
+        <!-- Call to Action -->
+        <div class="mt-12 sm:mt-16 pt-8 border-t border-[#1a1a1a]">
+          <div class="flex flex-col sm:flex-row gap-6">
+            <a href="/portfolio" class="px-6 py-3 bg-[#16a34a] text-black font-medium rounded-lg hover:bg-[#22c55e] transition-colors text-center">
+              View Portfolio →
+            </a>
+            <a href="https://github.com/NeaByteLab" target="_blank" rel="noopener" class="px-6 py-3 border border-[#1a1a1a] text-[#e5e5e5] font-medium rounded-lg hover:border-[#16a34a] transition-colors text-center">
+              GitHub →
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

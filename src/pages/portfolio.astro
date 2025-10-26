@@ -1,0 +1,190 @@
+---
+import { fetchUserInfo, fetchAllRepos } from '../lib/github'
+import BaseHead from '../components/BaseHead.astro'
+import { SITE_TITLE } from '../consts'
+const username = 'NeaByteLab'
+const user = await fetchUserInfo(username)
+const allRepos = await fetchAllRepos(username)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title={`${user.login}'s Portfolio - ${SITE_TITLE}`}
+      description={`${user.bio || `Portfolio of ${user.login} - ${user.public_repos} repositories on GitHub`}`}
+    />
+  </head>
+  <body class="bg-[#000000] text-[#e5e5e5]">
+    <main class="min-h-screen">
+      <!-- Hero Section with Profile -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-12">
+        <div class="mb-8">
+          <a href="/" class="text-sm text-[#16a34a] hover:text-[#22c55e] transition-colors">
+            ← Back to Home
+          </a>
+        </div>
+        <div class="flex flex-col md:flex-row items-center gap-8">
+          <img
+            src={user.avatar_url}
+            alt={user.login}
+            class="w-32 h-32 rounded-full border-4 border-[#16a34a]"
+          />
+          <div class="text-center md:text-left">
+            <h1 class="text-4xl sm:text-5xl font-light mb-3 tracking-tight">
+              <span class="text-[#e5e5e5]">{user.login}</span>
+            </h1>
+            {user.bio && (
+              <p class="text-lg text-[#8a8a8a] mb-4">{user.bio}</p>
+            )}
+            <div class="flex gap-6 text-sm text-[#8a8a8a]">
+              <span><strong class="text-[#16a34a]">{user.public_repos}</strong> repos</span>
+              <span><strong class="text-[#16a34a]">{user.followers}</strong> followers</span>
+              <span><strong class="text-[#16a34a]">{user.following}</strong> following</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Statistics Section -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="grid md:grid-cols-4 gap-4">
+          <div class="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-4 text-center">
+            <div class="text-2xl font-light text-[#16a34a]">{allRepos.length}</div>
+            <div class="text-xs text-[#8a8a8a] mt-1">Repositories</div>
+          </div>
+          <div class="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-4 text-center">
+            <div class="text-2xl font-light text-[#16a34a]">{allRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0)}</div>
+            <div class="text-xs text-[#8a8a8a] mt-1">Total Stars</div>
+          </div>
+          <div class="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-4 text-center">
+            <div class="text-2xl font-light text-[#16a34a]">{allRepos.reduce((sum, repo) => sum + repo.forks_count, 0)}</div>
+            <div class="text-xs text-[#8a8a8a] mt-1">Total Forks</div>
+          </div>
+          <div class="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-4 text-center">
+            <div class="text-2xl font-light text-[#16a34a]">{new Set(allRepos.map(r => r.language).filter(Boolean)).size}</div>
+            <div class="text-xs text-[#8a8a8a] mt-1">Languages</div>
+          </div>
+        </div>
+      </section>
+      <!-- Portfolio Section -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div class="mb-8">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search repositories..."
+            class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg text-[#e5e5e5] placeholder-[#8a8a8a] focus:outline-none focus:border-[#16a34a] transition-colors"
+          />
+        </div>
+        <div class="mb-8">
+          <p class="text-[#8a8a8a] text-sm">
+            Showing <span id="repoCount" class="text-[#16a34a] font-medium"></span> of <span class="text-[#e5e5e5]">{allRepos.length}</span> repositories
+          </p>
+        </div>
+        <div id="repoGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="pagination" class="mt-12"></div>
+      </section>
+    </main>
+    <script define:vars={{ allRepos }}>
+      const searchInput = document.getElementById('searchInput')
+      const repoGrid = document.getElementById('repoGrid')
+      const repoCount = document.getElementById('repoCount')
+      const perPage = 12
+      let currentPage = 1
+      let currentFiltered = allRepos
+      function paginate(filtered) {
+        currentFiltered = filtered
+        const start = (currentPage - 1) * perPage
+        const end = start + perPage
+        const paginated = filtered.slice(start, end)
+        const totalDisplayed = Math.min(end, filtered.length)
+        repoCount.textContent = `${start + 1}-${totalDisplayed}`
+        repoGrid.innerHTML = paginated.map(repo => `
+          <div class="repo-card bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-6 hover:border-[#16a34a] transition-colors">
+            <div class="flex items-start justify-between mb-3">
+              <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="text-lg font-medium text-[#16a34a] hover:text-[#22c55e] transition-colors">
+                ${repo.name}
+              </a>
+              ${repo.stargazers_count > 0 ? `<span class="text-sm text-[#8a8a8a]">⭐ ${repo.stargazers_count}</span>` : ''}
+            </div>
+            ${repo.description ? `<p class="text-sm text-[#8a8a8a] mb-4 line-clamp-2">${repo.description}</p>` : ''}
+            ${repo.language ? `
+              <div class="flex items-center gap-2 text-xs text-[#8a8a8a] mb-3">
+                <span class="w-2 h-2 rounded-full bg-[#16a34a]"></span>
+                ${repo.language}
+              </div>
+            ` : ''}
+            ${repo.topics.length > 0 ? `
+              <div class="flex flex-wrap gap-2 mb-4">
+                ${repo.topics.slice(0, 3).map(topic => `
+                  <span class="text-xs px-2 py-1 bg-[#16a34a]/10 text-[#16a34a] rounded">${topic}</span>
+                `).join('')}
+                ${repo.topics.length > 3 ? `<span class="text-xs text-[#8a8a8a]">+${repo.topics.length - 3}</span>` : ''}
+              </div>
+            ` : ''}
+            <div class="flex items-center justify-between pt-3 border-t border-[#1a1a1a]">
+              <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="text-sm text-[#16a34a] hover:text-[#22c55e] transition-colors">
+                View Repo →
+              </a>
+              <span class="text-xs text-[#8a8a8a]">
+                ${new Date(repo.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        `).join('')
+        updatePagination(filtered.length)
+      }
+
+      function updatePagination(totalItems) {
+        const totalPages = Math.ceil(totalItems / perPage)
+        const paginationDiv = document.getElementById('pagination')
+        if (!paginationDiv) return
+        paginationDiv.innerHTML = `
+          <div class="flex items-center justify-center gap-4">
+            <button id="prevBtn" class="px-4 py-2 bg-[#0a0a0a] border border-[#1a1a1a] text-[#e5e5e5] rounded hover:border-[#16a34a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed" ${currentPage === 1 ? 'disabled' : ''}>
+              Previous
+            </button>
+            <span class="text-[#8a8a8a] text-sm">
+              Page ${currentPage} of ${totalPages}
+            </span>
+            <button id="nextBtn" class="px-4 py-2 bg-[#0a0a0a] border border-[#1a1a1a] text-[#e5e5e5] rounded hover:border-[#16a34a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed" ${currentPage === totalPages ? 'disabled' : ''}>
+              Next
+            </button>
+          </div>
+        `
+
+        document.getElementById('prevBtn')?.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--
+            paginate(currentFiltered)
+          }
+        })
+
+        document.getElementById('nextBtn')?.addEventListener('click', () => {
+          const totalPages = Math.ceil(currentFiltered.length / perPage)
+          if (currentPage < totalPages) {
+            currentPage++
+            paginate(currentFiltered)
+          }
+        })
+      }
+
+      function search() {
+        const query = searchInput.value.toLowerCase()
+        return allRepos.filter(repo =>
+          repo.name.toLowerCase().includes(query) ||
+          repo.description?.toLowerCase().includes(query) ||
+          repo.language?.toLowerCase().includes(query)
+        )
+      }
+
+      searchInput.addEventListener('input', () => {
+        currentPage = 1
+        const filtered = search()
+        paginate(filtered)
+      })
+
+      paginate(allRepos)
+    </script>
+  </body>
+</html>
