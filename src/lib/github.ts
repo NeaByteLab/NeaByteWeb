@@ -22,17 +22,19 @@ interface GitHubUser {
 }
 
 const CACHE_DURATION = 1000 * 60 * 60
+const isDev = import.meta.env.DEV
 let reposCache: GitHubRepo[] | null = null
 let userCache: GitHubUser | null = null
-let cacheTime = 0
+let userCacheTime = 0
+let reposCacheTime = 0
 
 /**
- * Fetch user info from GitHub API with caching.
+ * Fetch user info from GitHub API with caching (dev mode only).
  * @param username - GitHub username
  * @returns User information
  */
 export async function fetchUserInfo(username: string): Promise<GitHubUser> {
-  if (userCache && Date.now() - cacheTime < CACHE_DURATION) {
+  if (isDev && userCache && Date.now() - userCacheTime < CACHE_DURATION) {
     return userCache
   }
   const response = await fetch(`https://api.github.com/users/${username}`, {
@@ -44,18 +46,20 @@ export async function fetchUserInfo(username: string): Promise<GitHubUser> {
     throw new Error(`GitHub API error: ${response.statusText}`)
   }
   const user = await response.json()
-  userCache = user
-  cacheTime = Date.now()
+  if (isDev) {
+    userCache = user
+    userCacheTime = Date.now()
+  }
   return user
 }
 
 /**
- * Fetch all repositories for a user with caching.
+ * Fetch all repositories for a user with caching (dev mode only).
  * @param username - GitHub username
  * @returns Array of repositories
  */
 export async function fetchAllRepos(username: string): Promise<GitHubRepo[]> {
-  if (reposCache && Date.now() - cacheTime < CACHE_DURATION) {
+  if (isDev && reposCache && Date.now() - reposCacheTime < CACHE_DURATION) {
     return reposCache
   }
   const repos: GitHubRepo[] = []
@@ -83,7 +87,9 @@ export async function fetchAllRepos(username: string): Promise<GitHubRepo[]> {
     }
     page++
   }
-  reposCache = repos
-  cacheTime = Date.now()
+  if (isDev) {
+    reposCache = repos
+    reposCacheTime = Date.now()
+  }
   return repos
 }
